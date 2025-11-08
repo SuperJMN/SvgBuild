@@ -1,0 +1,64 @@
+trigger:
+  branches:
+    include:
+      - main
+      - master
+
+pr:
+  branches:
+    include:
+      - '*'
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  - name: DOTNET_CLI_TELEMETRY_OPTOUT
+    value: '1'
+
+steps:
+  - checkout: self
+    fetchDepth: 0
+
+  - task: UseDotNet@2
+    displayName: Install .NET SDK
+    inputs:
+      packageType: sdk
+      version: 9.0.x
+
+  - script: dotnet --info
+    displayName: Display .NET info
+
+  - script: dotnet tool install --global DotnetDeployer.Tool
+    displayName: Install DotnetDeployer
+
+  - pwsh: |
+      $toolPath = Join-Path $env:HOME '.dotnet/tools'
+      Write-Host "##vso[task.prependpath]$toolPath"
+    displayName: Expose dotnet tools
+
+  - script: dotnet build SvgBuild.sln -c Release
+    displayName: Build solution
+
+  - pwsh: |
+      $branch = '$(Build.SourceBranch)'
+      $isMain = $branch -eq 'refs/heads/main'
+      $isMaster = $branch -eq 'refs/heads/master'
+      $shouldPush = $isMain -or $isMaster
+      Write-Host "Branch: $branch. Will push: $shouldPush"
+
+      $arguments = @(
+        'nuget',
+        '--api-key', '$(NuGetApiKey)',
+        '--configuration', 'Release',
+        '--solution', 'SvgBuild.sln'
+      )
+
+      if (-not $shouldPush) {
+        $arguments += '--no-push'
+      }
+
+      dotnetdeployer @arguments
+    env:
+      DOTNET_ROOT: $(Agent.ToolsDirectory)/dotnet
+    displayName: Package and publish with DotnetDeployer

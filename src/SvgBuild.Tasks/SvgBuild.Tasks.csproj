@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <PackageId>Zafiro.SvgBuild</PackageId>
+    <Authors>SuperJMN</Authors>
+    <Description>MSBuild task to convert SVG files into raster formats such as PNG and ICO.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/SuperJMN/SvgBuild</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/SuperJMN/SvgBuild</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <IncludeBuildOutput>true</IncludeBuildOutput>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CSharpFunctionalExtensions" Version="3.6.0" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.14.28" />
+    <PackageReference Include="Svg.Skia" Version="3.2.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="README.md" />
+    <None Include="build\SvgBuild.targets" Pack="true" PackagePath="build\SvgBuild.targets" />
+    <None Include="buildTransitive\SvgBuild.targets" Pack="true" PackagePath="buildTransitive\SvgBuild.targets" />
+  </ItemGroup>
+</Project>
