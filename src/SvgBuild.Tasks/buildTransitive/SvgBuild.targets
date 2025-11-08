@@ -1,0 +1,18 @@
+<Project>
+  <PropertyGroup>
+    <SvgBuildTasksAssembly Condition="Exists('$(MSBuildThisFileDirectory)..\lib\net8.0\SvgBuild.Tasks.dll')">$(MSBuildThisFileDirectory)..\lib\net8.0\SvgBuild.Tasks.dll</SvgBuildTasksAssembly>
+  </PropertyGroup>
+
+  <UsingTask Condition="'$(SvgBuildTasksAssembly)' != ''" TaskName="SvgBuild.Tasks.ConvertSvg" AssemblyFile="$(SvgBuildTasksAssembly)" />
+
+  <ItemGroup Condition="'@(SvgBuildConversion)' != ''">
+    <SvgBuildConversion Update="@(SvgBuildConversion)">
+      <OutputFormat Condition="'%(OutputFormat)' == ''">png</OutputFormat>
+    </SvgBuildConversion>
+  </ItemGroup>
+
+  <Target Name="SvgBuildConvert" Condition="'@(SvgBuildConversion)' != ''" BeforeTargets="BeforeBuild" Inputs="%(SvgBuildConversion.Identity)" Outputs="%(SvgBuildConversion.OutputPath)">
+    <Error Condition="'%(SvgBuildConversion.OutputPath)' == ''" Text="SvgBuildConversion item '%(SvgBuildConversion.Identity)' must declare OutputPath metadata." />
+    <ConvertSvg Condition="'%(SvgBuildConversion.OutputPath)' != ''" InputPath="%(SvgBuildConversion.Identity)" OutputFormat="%(SvgBuildConversion.OutputFormat)" OutputPath="%(SvgBuildConversion.OutputPath)" />
+  </Target>
+</Project>
